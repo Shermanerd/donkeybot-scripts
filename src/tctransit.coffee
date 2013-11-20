@@ -14,7 +14,7 @@
 #   hubot when is the next <route #> going <north/south/east/west> from <4 letter stop code>
 #
 # Author:
-#   pyro2927
+#   pschoenf/pyro2927
 
 module.exports = (robot) ->
   api = new TransitAPI(robot)
