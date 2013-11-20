@@ -128,7 +128,8 @@ module.exports = (robot) ->
 
   robot.respond /karma empty ?(\S+[^-\s])$/i, (msg) ->
     subject = msg.match[1].toLowerCase()
-    if allow_self is true or msg.message.user.name.toLowerCase() != subject
+    isAdmin = (process.env.HUBOT_AUTH_ADMIN or "").toLowerCase() is subject
+    if isAdmin or (allow_self is true or msg.message.user.name.toLowerCase() != subject)
       karma.kill subject
       msg.send "#{subject} has had its karma scattered to the winds."
     else
