@@ -17,7 +17,7 @@
 module.exports = (robot) ->
 
   robot.respond /(what\'s|what is|whats) @?([\w .\-]+) working on(\?)?$/i, (msg) ->
-    name = msg.match[1].trim()
+    name = msg.match[2].trim()
 
     if name is "you"
       msg.send "I dunno, robot things I guess."
