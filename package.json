@@ -12,6 +12,8 @@
     "robot"
   ],
 
+  "main": "index.coffee",
+
   "description": "Scripts for Donkeybot!",
 
   "licenses": [{
