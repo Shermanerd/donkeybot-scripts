@@ -8,8 +8,8 @@
 #   None
 #
 # Commands:
-#   Hello or Good Day make hubot say hello to you back
-#   Good Morning makes hubot say good morning to you back
+#   yo|sup|what's up|hey|hi|hello|good day - make hubot say hello to you back
+#   good morning - makes hubot say good morning to you back
 hellos = [
     "Well hello there, %",
     "Hey %, Hello!",
