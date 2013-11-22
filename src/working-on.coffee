@@ -75,6 +75,7 @@ module.exports = (robot) ->
             robot.send { user: { name: user } }, "#{entry.employee}: #{needs_work_by}"
           else
             robot.send { user: { name: user } }, "#{entry.employee}: #{needs_work_by} in #{entry.disciplines.join(', ')}"
+        robot.send { user: { name: user } }, "-----------"
         msg.reply "I sent you a list of the users needing work."
       else
         if work_type
