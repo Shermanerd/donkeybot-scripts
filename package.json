@@ -1,0 +1,33 @@
+{
+  "name": "donkeybot-scripts",
+  "version": "0.1.0",
+
+  "author": "Paul Schoenfelder",
+
+  "keywords": [
+    "donkeybot",
+    "plugin",
+    "scripts",
+    "bot",
+    "robot"
+  ],
+
+  "description": "Scripts for Donkeybot!",
+
+  "licenses": [{
+    "type": "MIT",
+    "url": "https://github.com/github/hubot-scripts/raw/master/LICENSE"
+  }],
+
+  "repository" : {
+    "type": "git",
+    "url": "https://github.com/bitwalker/donkeybot-scripts.git"
+  },
+
+  "dependencies": {
+    "flip": "~0.1.0",
+    "cleverbot-node": "~0.1.2",
+    "underscore": "~1.5.2",
+    "moment": "~2.4.0"
+  }
+}
