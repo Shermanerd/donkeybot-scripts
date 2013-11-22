@@ -10,6 +10,10 @@
 # Commands:
 #   hubot i am working on <anything> - Set what you're working on
 #   hubot what is everyone working on? - Find out what everyone is working on
+#   hubot who needs work - Find out who all needs work
+#   hubot who needs <discipline> work - Find out who all needs work within a discipline
+#   hubot who needs work in the next <n> <days|weeks|months> - Who needs work within a time range
+#   hubot who needs <discipline> work in the next <n> <days|weeks|months>
 #
 # Author:
 #   pschoenf
