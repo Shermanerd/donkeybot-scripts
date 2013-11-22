@@ -11,7 +11,7 @@
 #   beer me - Grab me a beer
 #
 # Author:
-#  houndbee
+#  pschoenf/houndbee
 
 beers = [
   "http://organicxbenefits.com/wp-content/uploads/2011/11/organic-beer-health-benefits.jpg",
