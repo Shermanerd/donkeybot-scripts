@@ -1,5 +1,5 @@
 # Description:
-#   None
+#   Provide beer on command
 #
 # Dependencies:
 #   None
