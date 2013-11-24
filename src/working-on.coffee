@@ -18,39 +18,12 @@
 # Author:
 #   pschoenf
 
-_      = require 'underscore'
-moment = require 'moment'
+_         = require 'underscore'
+moment    = require 'moment'
+Mainframe = require './mainframe'
 
 module.exports = (robot) ->
-
-  getAuthHeader = ->
-    username = process.env.HUBOT_MAINFRAME_USER
-    password = process.env.HUBOT_MAINFRAME_PASSWORD
-    return Authorization: "Basic #{new Buffer("#{username}:#{password}").toString("base64")}", Accept: "application/json", Cookie: 'PHPSESSID=1'
-
-  fetch_needs_work = (callback) =>
-    robot.http('https://mainframe.nerdery.com/needs-work/list/format/json')
-      .headers(getAuthHeader())
-      .get() (err, res, body) =>
-        if err or res.statusCode is 500
-          callback([])
-          return
-
-        data = JSON.parse(body)
-        results = _.map data, (entry) ->
-          employee_name = entry.consultant.name
-          work_by       = entry.needswork_by
-          disciplines   = []
-          disciplines.push(entry.consultant_discipline.name) if entry.consultant_discipline.id
-          disciplines.push(entry.consultant_secondary_discipline.name) if entry.consultant_secondary_discipline.id
-          disciplines.push(entry.consultant_tertiary_discipline.name) if entry.consultant_tertiary_discipline.id
-          return {
-            'employee': employee_name,
-            'needs_work_by': moment(Date.parse(work_by)),
-            'disciplines': disciplines
-          }
-
-        callback(results)
+  mainframe = new Mainframe(robot)
 
   robot.respond /(who needs|who is in need of) (.+\s?)?work( in the next (\d+) (days|weeks|months))?\??/i, (msg) =>
     msg.reply "Let me look!"
@@ -64,7 +37,7 @@ module.exports = (robot) ->
       range_num   = parseInt msg.match[4]
       range_scale = msg.match[5]
 
-    fetch_needs_work (results) ->
+    mainframe.getNeedsWorkEntries (results) ->
       needs_work_before = moment().add(range_scale, range_num)
       filtered = results.filter((r) -> r.needs_work_by.isBefore(needs_work_before) or r.needs_work_by.isSame(needs_work_before))
       filtered = if work_type then filtered.filter((r) -> _.any(r.disciplines, (d) -> d.toLowerCase() is work_type)) else filtered
