@@ -42,22 +42,29 @@ class WhoIsOut
 
   showNoticeBoard: (username, notices) =>
     if notices and notices.length
-      notices.forEach (n) -> @robot.send({ user: { name: username } }, "#{n.employee}, #{n.reason}")
+      special = notices.filter (n) -> n.special is true
+      # If there are nothing but special notices
+      if special.length is notices.length
+        @robot.send { user: { name: username } }, "There is nobody out, but there are #{special.length} other notices:"
+        special.forEach (s) -> @robot.send { user: { name: username } }, s.reason
+      else
+        notices.forEach (n) -> @robot.send { user: { name: username } }, "#{n.employee}, #{n.reason}"
     else
-      @robot.send({ user: { name: username } }, "There are no notices for that query.")
+      @robot.send { user: { name: username } }, "There are no notices for that query."
 
 module.exports = (robot)->
   select_date = moment()
   mainframe   = new Mainframe(robot)
   plugin      = new WhoIsOut(robot, mainframe)
 
-  robot.respond /(?:who's|who is) (out on vacation|out sick|sick|offsite|late for work|lfw|working from home|wfh|leaving early|out)$/i, (msg) ->
+  robot.respond /(?:who's|who is) (out on vacation|on vacation|out sick|sick|offsite|late for work|lfw|working from home|wfh|leaving early|out)$/i, (msg) ->
     msg.reply "I'll send you the list."
     absence_type = msg.match[1]
     plugin.getNoticeBoardEntries select_date, (entries) ->
       filter = 'all'
       switch absence_type
         when 'out on vacation'    then filter = 'vacation'
+        when 'on vacation'        then filter = 'vacation'
         when 'out sick'           then filter = 'sick'
         when 'sick'               then filter = 'sick'
         when 'offsite'            then filter = 'offsite'

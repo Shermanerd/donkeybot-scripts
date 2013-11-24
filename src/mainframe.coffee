@@ -90,15 +90,17 @@ class Mainframe
             result        = new NoticeBoardEntry()
             # Check if this is a special event
             if notice.toLowerCase().indexOf('happy') is 0
-              special_format  = /^Happy (Birthday|\d{1,2}(st|nd|rd|th) .+)\s?(on Saturday|on Sunday)? to (.*)!/i
+              special_format  = /^Happy (Birthday|\d{1,2}(?:st|nd|rd|th) .+)\s?(on Saturday|on Sunday)? to (.*)!/i
               parts           = special_format.exec notice
+              result.special  = true
               result.type     = parts[1].toLowerCase()
-              result.employee = if parts[3] then parts[3] else parts[2]
-              date_of         = if parts[3] then parts[2] else 'Today'
-              result.reason   = if date_of is 'Today' then "Today is their #{result.type}" else "#{date_of.substring(3)} is their #{result.type}"
+              result.employee = parts[3]
+              date_of         = if parts[2] then parts[2] else 'Today'
+              result.reason   = if date_of is 'Today' then "Today is #{result.employee}'s #{result.type}" else "#{date_of.substring(3)} is #{result.employee}'s #{result.type}"
             # Otherwise this is a vacation|sick day|late for work scenario
             else
               parts           = notice_format.exec notice
+              result.special  = false
               result.type     = notice_type.toLowerCase()
               result.employee = parts[1]
               result.reason   = parts[2]
