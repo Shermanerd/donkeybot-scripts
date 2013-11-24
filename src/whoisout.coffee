@@ -28,6 +28,9 @@ Mainframe = require './mainframe.coffee'
 class WhoIsOut
   constructor: (@robot, @mainframe, @cache = {}) ->
 
+  directMessage: (username, message) =>
+    @robot.send { user: { name: username} }, message
+
   getNoticeBoardEntries: (for_date, callback) =>
     # Cache requests to speed up replies and reduce load on Mainframe
     key = moment(for_date or new Date()).format('MM/DD/YYYY')
@@ -43,14 +46,17 @@ class WhoIsOut
   showNoticeBoard: (username, notices) =>
     if notices and notices.length
       special = notices.filter (n) -> n.special is true
+      normal  = notices.filter (n) -> n.special is false
       # If there are nothing but special notices
       if special.length is notices.length
-        @robot.send { user: { name: username } }, "There is nobody out, but there are #{special.length} other notices:"
-        special.forEach (s) -> @robot.send { user: { name: username } }, s.reason
+        @directMessage username, "There is nobody out, but there are #{special.length} other notices:"
+        special.forEach (s) -> @directMessage username, s.reason
       else
-        notices.forEach (n) -> @robot.send { user: { name: username } }, "#{n.employee}, #{n.reason}"
+        normal.forEach (n) -> @directMessage username, "#{n.employee}, #{n.reason}"
+        @directMessage username, "There are also #{special.length} other notices:"
+        special.forEach (s) -> @directMessage username, s.reason
     else
-      @robot.send { user: { name: username } }, "There are no notices for that query."
+      @directMessage username, "There are no notices for that query."
 
 module.exports = (robot)->
   select_date = moment()
