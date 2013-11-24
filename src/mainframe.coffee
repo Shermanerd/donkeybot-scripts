@@ -34,6 +34,15 @@ class NoticeBoardEntry
     @employee = 'Nobody'
     @reason   = 'Unknown'
 
+class WorkOrder
+  constructor: () ->
+    @id             = 'ADMIN'
+    @name           = 'ADMIN'
+    @client         = 'SIERRA'
+    @project        = 'ADMIN'
+    @estimatedHours = 0.00
+    @actualHours    = 0.00
+
 class Mainframe
   constructor: (@robot) ->
     @username = process.env.HUBOT_MAINFRAME_USER ||= ''
@@ -106,6 +115,43 @@ class Mainframe
               result.reason   = parts[2]
 
             results.push result
+          # Clean up memory
+          window.close()
+          # Send results back to caller
+          callback results
+
+  getWorkOrders: (username, callback) =>
+    @robot.http("https://mainframe.nerdery.com/workman.php?alt_user=#{username}")
+      .headers(@getAuthHeader())
+      .get() (err, res, body) =>
+        # Return sane default if request fails for any reason
+        if err or res.statusCode is 500
+          callback []
+          return
+
+        # Load result HTML in jsdom for scraping
+        jsdom.env html: body, src: [jquery], done: (errors, window) ->
+          # Exit early if loading fails
+          unless window
+            callback []
+            return
+
+          $       = window.$;
+          results = []
+          $('#assignedworkorders tbody tr').each (i, tr) ->
+            $tr           = $(tr)
+            wo = new WorkOrder()
+            wo.id = $tr.find('td:nth-child(2) a').html()
+            wo.name = $tr.find('td:nth-child(8) a').html()
+            wo.client = $tr.find('td:nth-child(3) a').html()
+            wo.project = $tr.find('td:nth-child(4) a').html()
+            # Parse hours actual/estimated
+            hours_format = /^(.*) \/ (.*)$/i
+            parts = hours_format.exec $tr.find('td:nth-child(5)').html()
+            wo.estimatedHours = parts[2].trim()
+            wo.actualHours = if parts[1].trim() then parts[1].trim() else 0.00
+
+            results.push wo
           # Clean up memory
           window.close()
           # Send results back to caller
