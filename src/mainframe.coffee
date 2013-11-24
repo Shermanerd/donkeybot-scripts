@@ -18,7 +18,7 @@
 moment = require 'moment'
 _      = require 'underscore'
 fs     = require 'fs'
-jquery = fs.readFileSync '../lib/jquery.js', 'utf-8'
+jquery = fs.readFileSync (Path.resolve __dirname, 'lib/jquery.js'), 'utf-8'
 
 module.exports = (robot) ->
   return new Mainframe(robot)
