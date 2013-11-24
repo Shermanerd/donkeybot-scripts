@@ -17,33 +17,32 @@
 
 moment = require 'moment'
 _      = require 'underscore'
+jsdom  = require 'jsdom'
 fs     = require 'fs'
-jquery = fs.readFileSync (Path.resolve __dirname, 'lib/jquery.js'), 'utf-8'
-
-module.exports = (robot) ->
-  return new Mainframe(robot)
+Path   = require 'path'
+jquery = fs.readFileSync (Path.resolve __dirname, '../lib/jquery.js'), 'utf-8'
 
 class NeedsWorkEntry
-  constructor () ->
+  constructor: () ->
     @employee      = 'Nobody'
     @needs_work_by = moment()
     @disciplines   = []
 
 class NoticeBoardEntry
-  constructor () ->
+  constructor: () ->
     @type     = 'None'
     @employee = 'Nobody'
     @reason   = 'Unknown'
 
 class Mainframe
-  constructor = (@robot) ->
+  constructor: (@robot) ->
     @username = process.env.HUBOT_MAINFRAME_USER ||= ''
     @password = process.env.HUBOT_MAINFRAME_PASSWORD ||= ''
 
-  getAuthHeader = =>
+  getAuthHeader: =>
     return Authorization: "Basic #{new Buffer("#{@username}:#{@password}").toString("base64")}", Accept: "application/json,text/plain,text/html", Cookie: 'PHPSESSID=1'
 
-  getNeedsWorkEntries = (callback) =>
+  getNeedsWorkEntries: (callback) =>
     @robot.http('https://mainframe.nerdery.com/needs-work/list/format/json')
       .headers(@getAuthHeader())
       .get() (err, res, body) =>
@@ -64,7 +63,7 @@ class Mainframe
 
         callback(results)
 
-  getNoticeBoardEntries = (select_date, callback) =>
+  getNoticeBoardEntries: (select_date, callback) =>
     select_date = select_date || moment(new Date()).format('MM/DD/YYYY')
     @robot.http("https://mainframe.nerdery.com/schedcal.php?sel_date=#{select_date}")
       .headers(@getAuthHeader())
@@ -75,7 +74,7 @@ class Mainframe
           return
 
         # Load result HTML in jsdom for scraping
-        jsdom.env url: body, src: [jquery], done: (errors, window) ->
+        jsdom.env html: body, src: [jquery], done: (errors, window) ->
           # Exit early if loading fails
           unless window
             callback []
@@ -91,16 +90,16 @@ class Mainframe
             result        = new NoticeBoardEntry()
             # Check if this is a special event
             if notice.toLowerCase().indexOf('happy') is 0
-              special_format  = /^Happy (Birthday|\d{1,2}(st|nd|rd|th) .+) (on Saturday|on Sunday)? to (.*)!/i
-              parts           = special_format.exec status
-              result.type     = parts[1]
+              special_format  = /^Happy (Birthday|\d{1,2}(st|nd|rd|th) .+)\s?(on Saturday|on Sunday)? to (.*)!/i
+              parts           = special_format.exec notice
+              result.type     = parts[1].toLowerCase()
               result.employee = if parts[3] then parts[3] else parts[2]
               date_of         = if parts[3] then parts[2] else 'Today'
-              result.reason   = if date_of is 'Today' then "Today is their #{reason}" else "#{date_of.substring(3)} is their #{reason}"
+              result.reason   = if date_of is 'Today' then "Today is their #{result.type}" else "#{date_of.substring(3)} is their #{result.type}"
             # Otherwise this is a vacation|sick day|late for work scenario
             else
-              parts           = notice_format.exec status
-              result.type     = notice_type
+              parts           = notice_format.exec notice
+              result.type     = notice_type.toLowerCase()
               result.employee = parts[1]
               result.reason   = parts[2]
 
@@ -109,4 +108,6 @@ class Mainframe
           window.close()
           # Send results back to caller
           callback results
+
+module.exports = Mainframe
 
