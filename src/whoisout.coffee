@@ -47,7 +47,7 @@ class WhoIsOut
       @robot.send({ user: { name: username } }, "There are no notices for that query.")
 
 module.exports = (robot)->
-  select_date = moment().subtract('days', 2)
+  select_date = moment()
   mainframe   = new Mainframe(robot)
   plugin      = new WhoIsOut(robot, mainframe)
 
