@@ -157,5 +157,47 @@ class Mainframe
           # Send results back to caller
           callback results
 
+  postTimeEntry: (entry, callback) =>
+    # POST data format
+    data = {
+      'id': 'NEW',
+      'ts_user': entry.user,
+      'self_user': entry.user,
+      'week_ending': entry.weekOf,
+      'current_week': entry.weekOf,
+      'day': entry.day,
+      'start_time': entry.startTime,
+      'end_time': entry.endTime,
+      'client': entry.client,
+      'project': entry.wo,
+      'notes': entry.note
+    }
+
+    @robot.http("https://mainframe.nerdery.com/timesheet.php")
+      .headers(@getAuthHeader())
+      .query(data)
+      .post() (err, res, body) =>
+        # Return false if request fails
+        if err or res.statusCode is 500
+          callback false, "Sorry, server error."
+        else
+          # Successful POST
+          if res.statusCode is 302
+            callback true
+          # POST failed for another reason, and we've been redirected
+          else
+            jsdom.env html: body, src: [jquery], done: (errs, window) ->
+              unless window
+                callback false, "I wasn't able to load your timesheet :("
+
+              errors = window.$('#TSEntryForm').prev('.error')
+              # Clean up memory
+              window.close();
+              if errors and errors.length
+                error = errors.text()?.replace(/\s{2,}/, ' ').trim();
+                callback false, error
+              else
+                callback true
+
 module.exports = Mainframe
 
