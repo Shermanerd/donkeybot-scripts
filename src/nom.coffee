@@ -19,3 +19,8 @@ module.exports = (robot) ->
     office = msg.match[1]
     mainframe.getNomSchedule office, (schedule) ->
       msg.reply schedule
+
+  robot.respond /what's for lunch in (\d{3,4})\??/i, (msg) ->
+    office = msg.match[1]
+    mainframe.getNomSchedule office, (schedule) ->
+      msg.reply schedule
