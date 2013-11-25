@@ -50,11 +50,12 @@ class WhoIsOut
       # If there are nothing but special notices
       if special.length is notices.length
         @directMessage username, "There is nobody out, but there are #{special.length} other notices:"
-        special.forEach (s) -> @directMessage username, s.reason
+        special.forEach (s) => @directMessage username, s.reason
       else
-        normal.forEach (n) -> @directMessage username, "#{n.employee}, #{n.reason}"
-        @directMessage username, "There are also #{special.length} other notices:"
-        special.forEach (s) -> @directMessage username, s.reason
+        normal.forEach (n) => @directMessage username, "#{n.employee}, #{n.reason}"
+        if special.length
+          @directMessage username, "There are also #{special.length} other notices:"
+          special.forEach (s) => @directMessage username, s.reason
     else
       @directMessage username, "There are no notices for that query."
 
