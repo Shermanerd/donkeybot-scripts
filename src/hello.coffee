@@ -31,7 +31,7 @@ module.exports = (robot) ->
   robot.hear /(yo|sup|what's up|hey|hi|hello|good( [d'])?ay(e)?)/i, (msg) ->
     expected = [ "#{robot.name} #{msg.match[1]}", "#{msg.match[1]} #{robot.name}" ]
     matches = _.any(expected, (phrase) -> msg.message.text.toLowerCase().indexOf(phrase.toLowerCase()) > -1)
-    unless matches
+    if matches
       hello = msg.random hellos
       msg.send hello.replace "%", msg.message.user.name
 
