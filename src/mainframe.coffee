@@ -78,7 +78,7 @@ class Mainframe
       .headers(@getAuthHeader())
       .get() (err, res, body) =>
         # Return sane default if request fails for any reason
-        if err or res.statusCode is 500
+        unless body and !err and res.statusCode isnt 500
           callback []
           return
 
