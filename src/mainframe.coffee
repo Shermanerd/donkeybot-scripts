@@ -189,6 +189,7 @@ class Mainframe
             jsdom.env html: body, src: [jquery], done: (errs, window) ->
               unless window
                 callback false, "I wasn't able to load your timesheet :("
+                return
 
               errors = window.$('#TSEntryForm').prev('.error')
               # Clean up memory
@@ -198,6 +199,52 @@ class Mainframe
                 callback false, error
               else
                 callback true
+
+  getNomSchedule: (office, callback) =>
+    schedule_date = moment()
+    office_location = 1
+    switch office.toLowerCase()
+      when '9555' then office_location = 1
+      when '9401' then office_location = 2
+      when '300'  then office_location = 3
+      when '208'  then office_location = 4
+      else office_location = 1 # Default to 9555
+
+    @robot.http("https://mainframe.nerdery.com/nom/ordering/schedule/date/#{schedule_date.format('YYYY-MM-DD')}/officeLocation/#{office_location}")
+      .headers(@getAuthHeader())
+      .get() (err, res, body) =>
+        if err or res.statusCode is 500
+          callback "Unable to get today's Nom schedule"
+        else
+          jsdom.env html: body, src: [jquery], done: (errs, window) ->
+            unless window
+              callback "Unable to get today's Nom schedule"
+              return
+
+            $ = window.$
+            results = []
+            # First check to see that a schedule exists
+            if $('.schedule .notice').length
+              callback $('.schedule .notice').text()
+              window.close()
+            else
+              # Scrape page for weekly schedule
+              $('.weeklySchedule').find('tbody tr:first-child td').each (i, el) ->
+                  $el  = $(el)
+                  day  = $('.weeklySchedule').find("thead th:nth-child(#{i + 1})").text()
+                  temp = []
+                  $el.find('ul li').each (j, el2) ->
+                      temp.push $(el2).text()
+                  date = moment(day, 'dd, MMM D')
+                  results.push date: date, selections: temp.join(', ')
+              # Clean up memory
+              window.close()
+              # Find today's schedule
+              schedule = _.find results, (item) -> return item.date.isSame(schedule_date, 'day')
+              if schedule
+                callback schedule.selections
+              else
+                callback "There is no schedule for today."
 
 module.exports = Mainframe
 
