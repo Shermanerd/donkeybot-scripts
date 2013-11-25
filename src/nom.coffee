@@ -9,6 +9,7 @@
 #
 # Commands:
 #   hubot nom for (9555|9401|300|208)
+#   hubot what's for lunch
 #   hubot what's for lunch in (9555|9401|300|208)
 
 Mainframe = require './mainframe'
@@ -24,3 +25,7 @@ module.exports = (robot) ->
     office = msg.match[1]
     mainframe.getNomSchedule office, (schedule) ->
       msg.reply schedule
+
+  robot.respond /what's for lunch \??/i, (msg) ->
+  	msg.reply "I have no idea where you are and therefore can't possibly be expected to answer that."
+
