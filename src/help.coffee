@@ -68,6 +68,7 @@ module.exports = (robot) ->
     cmds = cmds.map (cmd) ->
       cmd = cmd.replace /^hubot/, prefix
       cmd.replace /hubot/ig, robot.name
+    console.log cmds
 
     emit = cmds.join "\r"
     robot.send({ user: { name: user }}, emit)
