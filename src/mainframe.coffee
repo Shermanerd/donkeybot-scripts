@@ -109,10 +109,16 @@ class Mainframe
             # Otherwise this is a vacation|sick day|late for work scenario
             else
               parts           = notice_format.exec notice
-              result.special  = false
-              result.type     = notice_type.toLowerCase()
-              result.employee = parts[1]
-              result.reason   = parts[2]
+              if parts
+                result.special  = false
+                result.type     = notice_type.toLowerCase()
+                result.employee = parts[1]
+                result.reason   = parts[2]
+              else
+                result.special  = true
+                result.type     = "None"
+                result.employee = "Everyone"
+                result.reason   = notice
 
             results.push result
           # Clean up memory
