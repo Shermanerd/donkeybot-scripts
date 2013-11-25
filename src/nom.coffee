@@ -9,6 +9,7 @@
 #
 # Commands:
 #   hubot nom for (9555|9401|300|208)
+#   hubot what's for lunch in (9555|9401|300|208)
 
 Mainframe = require './mainframe'
 
