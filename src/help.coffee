@@ -11,6 +11,8 @@
 # Notes:
 #   These commands are grabbed from comment blocks at the top of each file.
 
+_ = require 'underscore'
+
 helpContents = (name, commands) ->
 
   """
@@ -68,8 +70,9 @@ module.exports = (robot) ->
     cmds = cmds.map (cmd) ->
       cmd = cmd.replace /^hubot/, prefix
       cmd.replace /hubot/ig, robot.name
-    console.log cmds
 
+    # Deduplicate
+    cmds = _.uniq cmds
     emit = cmds.join "\r"
     robot.send({ user: { name: user }}, emit)
 
